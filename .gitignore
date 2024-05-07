@@ -1,0 +1,3 @@
+.venv/
+histo_data_files/
+*.log
