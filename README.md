@@ -276,10 +276,17 @@ python3 etl_pipeline.py
 ### Requirements for part 1
 
 numpy==1.26.4
+
 pandas==2.2.2
+
 psycopg2-binary==2.9.9
+
 pyarrow==16.0.0
+
 requests==2.31.0
+
 SQLAlchemy==2.0.30
 
 **For data from January 2019 to February 2024, my table contains 106 197 954 rows**.
+
+[Download all Python codes](https://buy.stripe.com/3cs186bZAgnofsYcN2)

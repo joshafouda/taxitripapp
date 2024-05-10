@@ -41,3 +41,20 @@ group by vendorid,
 	congestion_surcharge,
 	airport_fee
 having count(*) > 1;
+
+SELECT date_trunc('year', tpep_dropoff_datetime) AS year, COUNT(*) AS num_trips
+FROM ytaxi_histo
+WHERE 
+	(trip_distance > 0 AND passenger_count > 0) 
+	AND 
+	((EXTRACT(YEAR FROM tpep_pickup_datetime) >= 2021 AND EXTRACT(YEAR FROM tpep_pickup_datetime) <= 2024) AND (EXTRACT(YEAR FROM tpep_dropoff_datetime) >= 2021 AND EXTRACT(YEAR FROM tpep_dropoff_datetime) <= 2024))
+GROUP BY year
+ORDER BY year;
+
+
+SELECT COUNT(*)
+FROM ytaxi_histo
+WHERE 
+	(trip_distance > 0 AND passenger_count > 0) 
+	AND 
+	(EXTRACT(YEAR FROM tpep_pickup_datetime) = 2023 AND EXTRACT(YEAR FROM tpep_dropoff_datetime) = 2023);

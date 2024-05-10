@@ -7,7 +7,7 @@ from datetime import datetime
 
 def download_histo_data(path_to_histo_data_folder):
     """
-    Downloads yellow taxi trip PARQUET files from 2019 to current year into the specified folder.
+    Downloads yellow taxi trip PARQUET files from 2021 to current year into the specified folder.
 
     Parameters:
     path_to_histo_data_folder (str): Path to the folder where files will be saved.
@@ -22,8 +22,8 @@ def download_histo_data(path_to_histo_data_folder):
         # Current year
         current_year = datetime.now().year
 
-        # Loop over years from current year to 2019
-        for year in range(current_year, 2018, -1):
+        # Loop over years from current year to 2021
+        for year in range(current_year, 2020, -1):
             for month in range(1, 13):
                 # Construct download URL based on year and month
                 download_url = f"https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_{year}-{month:02d}.parquet"
