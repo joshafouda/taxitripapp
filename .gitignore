@@ -1,3 +1,5 @@
 .venv/
 histo_data_files/
+merged_chunk_parquet/
 *.log
+*.parquet
