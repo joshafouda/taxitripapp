@@ -26,6 +26,61 @@ Once the data is collected, the Extract, Transform, Load (ETL) process is initia
 
 The data is extracted from the source files downloaded from the TLC website (https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page). Actually, these files are in PARQUET format like specified by the source.
 
+Here the description of each variable for yellow taxi data:
+
+1. **VendorID** : Un code indiquant le fournisseur TPEP qui a fourni l'enregistrement. 1= Creative Mobile Technologies, LLC; 2= VeriFone Inc.
+
+2. **tpep_pickup_datetime** : La date et l'heure auxquelles le compteur a été engagé.
+
+3. **tpep_dropoff_datetime** : La date et l'heure auxquelles le compteur a été désengagé.
+
+4. **Passenger_count** : Le nombre de passagers dans le véhicule. Ceci est une valeur saisie par le conducteur.
+
+5. **Trip_distance** : La distance de voyage écoulée en miles rapportée par le taximètre.
+
+6. **RateCodeID** : Le code tarifaire final en vigueur à la fin du voyage.
+   1= Tarif standard
+   2= JFK
+   3= Newark
+   4= Nassau ou Westchester
+   5= Tarif négocié
+   6= Trajet en groupe
+
+7. **Store_and_fwd_flag** : Ce drapeau indique si l'enregistrement du voyage a été conservé en mémoire dans le véhicule avant d'être envoyé au fournisseur, autrement dit "stockage et transmission différée", car le véhicule n'avait pas de connexion au serveur.
+   Y= Voyage enregistré et transmis ultérieurement
+   N= Pas de voyage enregistré et transmis ultérieurement
+
+8. **PULocationID** : Zone de taxi TLC dans laquelle le taximètre a été engagé.
+
+9. **DOLocationID** : Zone de taxi TLC dans laquelle le taximètre a été désengagé.
+
+10. **Payment_type** : Un code numérique indiquant comment le passager a payé pour le voyage.
+    1= Carte de crédit
+    2= Espèces
+    3= Gratuit
+    4= Litige
+    5= Inconnu
+    6= Voyage annulé
+
+11. **Fare_amount** : Le montant du tarif calculé en fonction du temps et de la distance par le compteur.
+
+12. **Extra** : Extras et suppléments divers. Actuellement, cela inclut uniquement les frais de $0,50 et $1 pour les heures de pointe et les trajets de nuit.
+
+13. **MTA_tax** : Taxe MTA de $0,50 automatiquement déclenchée en fonction du tarif en cours d'utilisation.
+
+14. **Tip_amount** : Montant du pourboire - Ce champ est automatiquement renseigné pour les pourboires par carte de crédit. Les pourboires en espèces ne sont pas inclus.
+
+15. **Tolls_amount** : Montant total de tous les péages payés lors du voyage.
+
+16. **Improvement_surcharge** : Supplément d'amélioration de $0,30 facturé au départ du drapeau. Le supplément d'amélioration a commencé à être prélevé en 2015.
+
+17. **Total_amount** : Le montant total facturé aux passagers. Ne comprend pas les pourboires en espèces.
+
+18. **Congestion_Surcharge** : Montant total collecté lors du voyage pour la surcharge de congestion de l'État de New York.
+
+19. **Airport_fee** : $1.25 pour les prises en charge uniquement aux aéroports de LaGuardia et John F. Kennedy.
+
+
 **Transformation**:
 
 Once the data is extracted, it undergoes transformations to clean, structure, and prepare it for loading into the database.
@@ -290,3 +345,136 @@ SQLAlchemy==2.0.30
 **For data from January 2019 to February 2024, my table contains 106 197 954 rows**.
 
 [Download all Python codes](https://buy.stripe.com/3cs186bZAgnofsYcN2)
+
+
+# Approach: PARQUET -----------PANDAS----------> PostgreSQL
+
+![](imgs/data_pipeline_pandas.png)
+
+**Taxi Trip Analysis: ETL Approach with Parquet, Pandas, and PostgreSQL**
+
+Analyzing New York City taxi trip data requires an efficient approach for extracting, transforming, and loading (ETL) the data. In this context, I opted for an approach that utilizes Parquet files available on the official website of New York City. Here's how this approach is implemented and the associated advantages and disadvantages of each technical choice.
+
+**Data Extraction:**
+
+After downloading the raw data files in Parquet format from the New York City website, I used the `pd.read_parquet` function of Pandas to extract the data from each file. This step is relatively simple and efficient due to Pandas' native support for Parquet. This allows for quick loading of data into Pandas DataFrames for further processing.
+
+**Data Transformation:**
+
+The necessary transformations on the taxi trip data were performed using the powerful features of Pandas. This includes operations such as data cleaning, handling missing values, calculating new features, and merging multiple DataFrames. Pandas' processing capabilities were used to transform the data into the required format for further analysis.
+
+**Loading into PostgreSQL:**
+
+Once the transformations were done, each transformed Pandas DataFrame was loaded into a PostgreSQL table. This was achieved using Pandas' built-in capabilities to interact with relational databases via JDBC connections. Loading the data into PostgreSQL offers several advantages, including the ability to leverage advanced relational data management features and the power of SQL querying for complex analyses.
+
+**Advantages of the Overall Approach:**
+
+1. **Flexible Processing**: Despite the execution time, using Pandas for transformations offers significant flexibility and expressiveness to manipulate data based on specific analysis needs.
+
+2. **Data Reliability**: Loading into PostgreSQL ensures data persistence and reliability, facilitating reproducibility of analyses and collaboration among team members.
+
+**Disadvantages of the Overall Approach:**
+
+1. **Execution Time**: Despite Pandas' speed in processing data, executing the entire ETL pipeline, including loading into PostgreSQL, can take time, especially with large datasets.
+
+2. **Configuration Complexity**: Setting up infrastructure to extract, transform, and load data may require complex initial configuration, especially to ensure compatibility between Pandas, Parquet, and PostgreSQL.
+
+**Advantages and Disadvantages of a Relational Database:**
+
+1. **Advantages**:
+   - **Structured Organization**: Relational databases offer organized data structure in tables, making data management and manipulation easier.
+   - **Data Integrity**: Relational databases provide mechanisms to ensure data integrity, such as referential integrity constraints.
+
+2. **Disadvantages**:
+   - **Limited Scalability**: Relational databases may face performance and scalability issues with large datasets or intensive workloads.
+   - **Rigid Schema**: Data schemas in relational databases are rigid, making it challenging to adapt to changes in data requirements.
+
+**Limitations of Solely Using SQL for Analyses:**
+
+While SQL is a powerful language for data querying, it has limitations in terms of analysis complexity and flexibility for advanced data manipulations. This can be restrictive for exploratory analyses and complex data manipulations, often requiring a combination of programming and SQL skills to achieve optimal results.
+
+**Conclusion:**
+
+In conclusion, the ETL approach with Parquet, Pandas, and PostgreSQL offers a robust and efficient solution for analyzing New York City taxi trip data. Although this approach has some disadvantages in terms of execution time and configuration complexity, the advantages in terms of processing flexibility and data reliability make it a solid choice for this type of analysis. However, it's important to recognize the limitations of SQL for advanced analyses and to combine programming skills with SQL skills to achieve optimal results.
+
+
+
+# Approach PARQUETS -----------PYSPARK----------> PARQUET
+
+![](imgs/data_pipeline_pyspark.png)
+
+**Taxi Trip Analysis: ETL Approach with PySpark and Parquet**
+
+In this second approach to analyzing New York City taxi trip data, we adopt a method based on PySpark for data extraction, transformation, and loading (ETL). Here's how this approach is implemented and the advantages and disadvantages associated with each step of the process.
+
+**Data Extraction:**
+
+Similar to the first approach, we start by downloading the raw data files in Parquet format from the New York City website. However, instead of using Pandas for extraction, we use PySpark to import each Parquet file as a Spark DataFrame. PySpark is optimized for distributed processing and can efficiently handle large datasets, making it ideal for this task.
+
+**Data Transformation:**
+
+Transformations on the taxi trip data are performed using PySpark's powerful features. This includes operations such as data cleaning, handling missing values, calculating new features, and merging multiple DataFrames. PySpark's distributed processing capabilities enable efficient handling of large datasets and accelerate transformation operations.
+
+**Loading into a Single Parquet File:**
+
+Once the transformations are done, the data is written into a single Parquet file. This step is fast and efficient due to PySpark's distributed processing capabilities. The resulting Parquet file contains all the transformed data, ready for further analysis.
+
+**Advantages of the Approach:**
+
+1. **Distributed Processing**: PySpark enables distributed data processing, allowing efficient handling of large datasets and speeding up transformation operations.
+
+2. **Interoperability with Hadoop**: PySpark easily integrates with Hadoop, facilitating deployment of analytics solutions on existing Hadoop clusters.
+
+3. **Scalability**: This approach is highly scalable and can easily be adapted to handle even larger volumes of data as analysis needs grow.
+
+4. **Memory Management**: With distributed memory management, this approach avoids memory saturation issues often encountered with other solutions.
+
+5. **Integration with Machine Learning**: PySpark has dedicated frameworks for machine learning (MLlib), making it easy to extend analysis to machine learning tasks.
+
+**Disadvantages of the Approach:**
+
+1. **Configuration Complexity**: Setting up a PySpark infrastructure requires complex initial configuration, especially to ensure compatibility with existing Hadoop environments.
+
+2. **Learning Curve**: PySpark has a steeper learning curve compared to Pandas, requiring additional training for users less familiar with Python and Spark.
+
+This approach differs from the previous one in that it uses PySpark to handle data operations and Parquet as the final storage format. Here's a comparison between using an SQL database and Parquet files as the final destination for transformed data.
+
+**SQL Table as Final Destination:**
+
+*Advantages:*
+
+1. **Data Structuring**: A relational database offers a well-defined data structure with tables, schemas, and constraints that facilitate data manipulation and management.
+
+2. **SQL Queries**: SQL databases allow for executing complex SQL queries to analyze and extract insights from data. SQL is a powerful and widely-used language in the data analysis domain.
+
+3. **Transaction Management**: SQL databases support ACID (Atomicity, Consistency, Isolation, Durability) transactions, ensuring data integrity and reliability.
+
+*Disadvantages:*
+
+1. **Maintenance Cost**: Setting up and maintaining an SQL database can be costly in terms of hardware resources, software licenses, and skilled personnel to manage and administer the database.
+
+2. **Limited Scalability**: SQL databases may encounter performance and scalability issues when faced with large datasets or intensive workloads.
+
+**Parquet File as Final Destination:**
+
+*Advantages:*
+
+1. **Efficient Compression**: Parquet uses efficient compression techniques that reduce file size while preserving data quality and integrity. This saves storage space and reduces associated costs.
+
+2. **Fast Processing**: Parquet is optimized for distributed and parallel processing, speeding up data read and write operations, especially when performed with tools like PySpark.
+
+3. **Support for Complex Data Structures**: Parquet supports complex data structures, including semi-structured and hierarchical data, making it suitable for a wide range of use cases.
+
+*Disadvantages:*
+
+1. **Query Limitations**: Unlike SQL databases, Parquet files do not support complex SQL queries. Data analysis and transformation operations must be performed using tools compatible with Parquet, such as PySpark.
+
+2. **Transaction Management**: Parquet does not support ACID transactions, which can lead to data integrity and consistency issues in case of write operation failure.
+
+**Conclusion:**
+
+In conclusion, the ETL approach with PySpark and Parquet offers a robust and efficient solution for analyzing New York City taxi trip data. Although this approach poses some challenges in terms of configuration and learning, the benefits in terms of distributed processing, interoperability with Hadoop, scalability, memory management, and integration with machine learning make it a solid choice for organizations dealing with large datasets and requiring fast, efficient, and scalable analytics.
+
+Both approaches, using an SQL database and Parquet files as the final destination for transformed data, have distinct advantages and disadvantages. The choice between the two will depend on the organization's specific needs in terms of performance, costs, security, and ease of data management. In the context of our taxi trip analysis project, using Parquet files offers an efficient and cost-effective solution, especially when paired with PySpark for distributed data processing.
+
+

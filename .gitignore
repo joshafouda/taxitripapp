@@ -1,5 +1,7 @@
 .venv/
 histo_data_files/
 merged_chunk_parquet/
+data_loaded/
 *.log
 *.parquet
+config.json
